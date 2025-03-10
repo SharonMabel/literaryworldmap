@@ -13,6 +13,12 @@
             color: #333;
         }
         
+        @media (max-width: 768px) {
+            .map-container {
+                height: 400px !important;
+            }
+        }
+        
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -52,6 +58,7 @@
             height: 20px;
             transform: translate(-50%, -100%);
             cursor: pointer;
+            z-index: 10;
         }
         
         .marker:before {
@@ -182,7 +189,7 @@
         
         <div class="map-container">
             <div id="world-map">
-                <img src="/api/placeholder/1200/600" alt="Weltkarte" style="width: 100%; height: 100%; object-fit: cover;">
+                <img src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/worldmap.png" alt="Weltkarte" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDYwMCIgd2lkdGg9IjEyMDAiIGhlaWdodD0iNjAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImciIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzk1Y2RlNSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2U2ZjJmZiIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxyZWN0IGZpbGw9InVybCgjZykiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiLz48cGF0aCBkPSJNMjAwLDE1MCBMNDAwLDIwMCBMNjAwLDE1MCBMMTAAMC8xNTAgTDk1MCwxODAgTDExMDAsMjEwIEwxMjAwLDIyMCBMMTIwMCw2MDAgTDAsNjAwIFoiIGZpbGw9IiNhNGNjZGYiLz48cGF0aCBkPSJNMjUwLDMwMCBMNDUwLDI4MCBMNjUwLDMxMCBMODUwLDMzMCBMMTA1MCwyOTAgTDEyMDAsNTAwIEwxMjAwLDYwMCBMMCw2MDAgWiIgZmlsbD0iIzg0YjhjYiIvPjxwYXRoIGQ9Ik00OCwzNTAgTDIwMCw0MDAgTDQ1MCwzODAgTDYwMCw0MjAgTDgwMCwzOTAgTDk3NSw0MTAgTDEyMDAsNTgwIEwxMjAwLDYwMCBMMCw2MDAgWiIgZmlsbD0iIzY0YTRiNyIvPjwvc3ZnPg=='">
                 
                 <!-- Deutschland -->
                 <div class="marker deutschland">
