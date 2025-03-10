@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Autorinnen-Weltkarte mit Zeitzonen</title>
+    <title>Autorinnen-Zeitzonen Dashboard</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,12 +11,6 @@
             padding: 0;
             background-color: #f5f5f5;
             color: #333;
-        }
-        
-        @media (max-width: 768px) {
-            .map-container {
-                height: 400px !important;
-            }
         }
         
         .container {
@@ -35,105 +29,80 @@
             margin-bottom: 10px;
         }
         
-        .map-container {
+        .clock-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .clock-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
             position: relative;
-            width: 100%;
-            height: 600px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            margin-bottom: 20px;
         }
         
-        #world-map {
-            width: 100%;
-            height: 100%;
-            background-color: #e6f2ff;
+        .clock-card:hover {
+            transform: translateY(-5px);
         }
         
-        .marker {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            transform: translate(-50%, -100%);
-            cursor: pointer;
-            z-index: 10;
-        }
-        
-        .marker:before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 15px solid currentColor;
-        }
-        
-        .marker:after {
+        .clock-card:before {
             content: '';
             position: absolute;
             top: 0;
-            left: 5px;
-            width: 10px;
-            height: 10px;
-            background-color: white;
-            border-radius: 50%;
+            left: 0;
+            width: 100%;
+            height: 5px;
         }
         
-        .marker-popup {
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: white;
-            border-radius: 5px;
-            padding: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            width: 200px;
-            display: none;
-            z-index: 100;
-        }
+        .clock-card.florida:before { background-color: #e74c3c; }
+        .clock-card.deutschland:before { background-color: #2ecc71; }
+        .clock-card.indien:before { background-color: #f39c12; }
+        .clock-card.niederlande:before { background-color: #9b59b6; }
+        .clock-card.alaska:before { background-color: #1abc9c; }
         
-        .marker:hover .marker-popup {
-            display: block;
-        }
-        
-        .marker-name {
+        .location-name {
             font-weight: bold;
+            font-size: 1.3em;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
         }
         
-        .marker-time {
-            font-size: 1.2em;
-            color: #2980b9;
+        .location-description {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+            font-style: italic;
         }
         
-        .marker-date {
-            font-size: 0.8em;
+        .time-display {
+            font-size: 2.5em;
+            font-weight: 300;
+            text-align: center;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .date-display {
+            text-align: center;
             color: #7f8c8d;
         }
         
-        .locations-panel {
-            background-color: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        .time-difference {
+            text-align: center;
+            margin-top: 15px;
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
         }
         
-        .location-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .location-item:last-child {
-            border-bottom: none;
+        .emoji {
+            margin-left: 8px;
+            font-size: 1.2em;
         }
         
         .add-location {
@@ -145,10 +114,11 @@
         }
         
         input, select, button {
-            padding: 8px 12px;
+            padding: 10px 15px;
             margin: 5px 0;
             border: 1px solid #ddd;
             border-radius: 4px;
+            width: 100%;
         }
         
         button {
@@ -157,6 +127,7 @@
             border: none;
             cursor: pointer;
             transition: background-color 0.3s;
+            font-weight: bold;
         }
         
         button:hover {
@@ -173,97 +144,68 @@
             font-weight: bold;
         }
         
-        .marker.florida { color: #e74c3c; top: 42%; left: 25%; }
-        .marker.deutschland { color: #2ecc71; top: 33%; left: 52%; }
-        .marker.indien { color: #f39c12; top: 45%; left: 70%; }
-        .marker.niederlande { color: #9b59b6; top: 32%; left: 51%; }
-        .marker.alaska { color: #1abc9c; top: 25%; left: 15%; }
+        @media (max-width: 768px) {
+            .clock-container {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Meine literarische Weltkarte</h1>
+            <h1>Meine literarische Zeitzonenkarte</h1>
             <p>Halte den Überblick über die Zeitzonen deiner internationalen Leser und Kontakte</p>
         </header>
         
-        <div class="map-container">
-            <div id="world-map">
-                <img src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/worldmap.png" alt="Weltkarte" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMjAwIDYwMCIgd2lkdGg9IjEyMDAiIGhlaWdodD0iNjAwIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImciIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSI+PHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzk1Y2RlNSIvPjxzdG9wIG9mZnNldD0iMTAwJSIgc3RvcC1jb2xvcj0iI2U2ZjJmZiIvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjxyZWN0IGZpbGw9InVybCgjZykiIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiLz48cGF0aCBkPSJNMjAwLDE1MCBMNDAwLDIwMCBMNjAwLDE1MCBMMTAAMC8xNTAgTDk1MCwxODAgTDExMDAsMjEwIEwxMjAwLDIyMCBMMTIwMCw2MDAgTDAsNjAwIFoiIGZpbGw9IiNhNGNjZGYiLz48cGF0aCBkPSJNMjUwLDMwMCBMNDUwLDI4MCBMNjUwLDMxMCBMODUwLDMzMCBMMTA1MCwyOTAgTDEyMDAsNTAwIEwxMjAwLDYwMCBMMCw2MDAgWiIgZmlsbD0iIzg0YjhjYiIvPjxwYXRoIGQ9Ik00OCwzNTAgTDIwMCw0MDAgTDQ1MCwzODAgTDYwMCw0MjAgTDgwMCwzOTAgTDk3NSw0MTAgTDEyMDAsNTgwIEwxMjAwLDYwMCBMMCw2MDAgWiIgZmlsbD0iIzY0YTRiNyIvPjwvc3ZnPg=='">
-                
-                <!-- Deutschland -->
-                <div class="marker deutschland">
-                    <div class="marker-popup">
-                        <div class="marker-name">Deutschland (Du)</div>
-                        <div class="marker-time" id="time-deutschland"></div>
-                        <div class="marker-date" id="date-deutschland"></div>
-                    </div>
-                </div>
-                
-                <!-- Florida -->
-                <div class="marker florida">
-                    <div class="marker-popup">
-                        <div class="marker-name">Florida (Dein Flirt 😉)</div>
-                        <div class="marker-time" id="time-florida"></div>
-                        <div class="marker-date" id="date-florida"></div>
-                    </div>
-                </div>
-                
-                <!-- Indien -->
-                <div class="marker indien">
-                    <div class="marker-popup">
-                        <div class="marker-name">Indien (Leser)</div>
-                        <div class="marker-time" id="time-indien"></div>
-                        <div class="marker-date" id="date-indien"></div>
-                    </div>
-                </div>
-                
-                <!-- Niederlande -->
-                <div class="marker niederlande">
-                    <div class="marker-popup">
-                        <div class="marker-name">Niederlande (Leser)</div>
-                        <div class="marker-time" id="time-niederlande"></div>
-                        <div class="marker-date" id="date-niederlande"></div>
-                    </div>
-                </div>
-                
-                <!-- Alaska -->
-                <div class="marker alaska">
-                    <div class="marker-popup">
-                        <div class="marker-name">Alaska (Autor-Kollege)</div>
-                        <div class="marker-time" id="time-alaska"></div>
-                        <div class="marker-date" id="date-alaska"></div>
-                    </div>
-                </div>
+        <div class="clock-container">
+            <!-- Deutschland (Du) -->
+            <div class="clock-card deutschland">
+                <div class="location-name">Deutschland <span class="emoji">🏠</span></div>
+                <div class="location-description">Dein Standort</div>
+                <div class="time-display" id="time-deutschland"></div>
+                <div class="date-display" id="date-deutschland"></div>
             </div>
-        </div>
-        
-        <div class="locations-panel">
-            <h2>Alle Zeitzonen auf einen Blick</h2>
-            <div class="location-item">
-                <div>Deutschland (Du)</div>
-                <div id="list-time-deutschland"></div>
+            
+            <!-- Florida (Flirt) -->
+            <div class="clock-card florida">
+                <div class="location-name">Florida <span class="emoji">😉</span></div>
+                <div class="location-description">Dein Flirt</div>
+                <div class="time-display" id="time-florida"></div>
+                <div class="date-display" id="date-florida"></div>
+                <div class="time-difference" id="diff-florida"></div>
             </div>
-            <div class="location-item">
-                <div>Florida (Dein Flirt)</div>
-                <div id="list-time-florida"></div>
+            
+            <!-- Indien (Leser) -->
+            <div class="clock-card indien">
+                <div class="location-name">Indien <span class="emoji">📚</span></div>
+                <div class="location-description">Deine Leser</div>
+                <div class="time-display" id="time-indien"></div>
+                <div class="date-display" id="date-indien"></div>
+                <div class="time-difference" id="diff-indien"></div>
             </div>
-            <div class="location-item">
-                <div>Indien (Leser)</div>
-                <div id="list-time-indien"></div>
+            
+            <!-- Niederlande (Leser) -->
+            <div class="clock-card niederlande">
+                <div class="location-name">Niederlande <span class="emoji">🌷</span></div>
+                <div class="location-description">Deine Leser</div>
+                <div class="time-display" id="time-niederlande"></div>
+                <div class="date-display" id="date-niederlande"></div>
+                <div class="time-difference" id="diff-niederlande"></div>
             </div>
-            <div class="location-item">
-                <div>Niederlande (Leser)</div>
-                <div id="list-time-niederlande"></div>
-            </div>
-            <div class="location-item">
-                <div>Alaska (Autor-Kollege)</div>
-                <div id="list-time-alaska"></div>
+            
+            <!-- Alaska (Autor-Kollege) -->
+            <div class="clock-card alaska">
+                <div class="location-name">Alaska <span class="emoji">❄️</span></div>
+                <div class="location-description">Dein Autor-Kollege</div>
+                <div class="time-display" id="time-alaska"></div>
+                <div class="date-display" id="date-alaska"></div>
+                <div class="time-difference" id="diff-alaska"></div>
             </div>
         </div>
         
         <div class="add-location">
-            <h2>Neuen Ort hinzufügen</h2>
+            <h2>Neuen Kontakt hinzufügen</h2>
             <form id="add-location-form">
                 <div class="form-group">
                     <label for="location-name">Name des Ortes:</label>
@@ -304,6 +246,10 @@
                     <label for="location-description">Beschreibung:</label>
                     <input type="text" id="location-description" placeholder="z.B. Leser, Autor, etc.">
                 </div>
+                <div class="form-group">
+                    <label for="location-emoji">Emoji:</label>
+                    <input type="text" id="location-emoji" placeholder="z.B. 📱 oder 🌟">
+                </div>
                 <button type="submit">Hinzufügen</button>
             </form>
         </div>
@@ -322,6 +268,7 @@
         // Funktion zum Aktualisieren aller Uhrzeiten
         function updateAllTimes() {
             const now = new Date();
+            const homeOffset = timeZones['deutschland'].offset;
             
             for (const [location, timezone] of Object.entries(timeZones)) {
                 // Zeit für diesen Ort berechnen
@@ -331,6 +278,7 @@
                 const timeStr = localTime.toLocaleTimeString('de-DE', { 
                     hour: '2-digit', 
                     minute: '2-digit',
+                    second: '2-digit',
                     hour12: false
                 });
                 
@@ -341,25 +289,34 @@
                     month: 'long' 
                 });
                 
-                // Aktualisieren der Anzeigen auf der Karte
+                // Aktualisieren der Anzeigen
                 document.getElementById(`time-${location}`).textContent = timeStr;
                 document.getElementById(`date-${location}`).textContent = dateStr;
                 
-                // Aktualisieren der Anzeigen in der Liste
-                document.getElementById(`list-time-${location}`).textContent = timeStr;
+                // Zeitdifferenz zu Deutschland berechnen (außer für Deutschland selbst)
+                if (location !== 'deutschland') {
+                    const diffInHours = timezone.offset - homeOffset;
+                    const diffStr = diffInHours > 0 
+                        ? `${Math.abs(diffInHours)} Stunden vor dir` 
+                        : diffInHours < 0 
+                            ? `${Math.abs(diffInHours)} Stunden hinter dir` 
+                            : 'Gleiche Zeitzone wie du';
+                    
+                    document.getElementById(`diff-${location}`).textContent = diffStr;
+                }
             }
         }
 
         // Initial alle Uhrzeiten aktualisieren
         updateAllTimes();
         
-        // Alle 60 Sekunden aktualisieren
-        setInterval(updateAllTimes, 60000);
+        // Alle Sekunde aktualisieren für eine laufende Uhr
+        setInterval(updateAllTimes, 1000);
         
         // Formular zum Hinzufügen neuer Orte
         document.getElementById('add-location-form').addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Diese Funktion wäre in einer vollständigen Version implementiert. Du könntest hier neue Kontakte hinzufügen und auf der Karte platzieren.');
+            alert('Diese Funktion wäre in einer vollständigen Version implementiert. Du könntest hier neue Kontakte hinzufügen.');
         });
     </script>
 </body>
