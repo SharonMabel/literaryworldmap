@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autorinnen-Weltkarte mit Zeitzonen</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        #world-map {
+            width: 100%;
+            height: 100%;
+            background-color: #e6f2ff;
+        }
+        
+        .marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            transform: translate(-50%, -100%);
+            cursor: pointer;
+        }
+        
+        .marker:before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 15px solid currentColor;
+        }
+        
+        .marker:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 5px;
+            width: 10px;
+            height: 10px;
+            background-color: white;
+            border-radius: 50%;
+        }
+        
+        .marker-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 200px;
+            display: none;
+            z-index: 100;
+        }
+        
+        .marker:hover .marker-popup {
+            display: block;
+        }
+        
+        .marker-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .marker-time {
+            font-size: 1.2em;
+            color: #2980b9;
+        }
+        
+        .marker-date {
+            font-size: 0.8em;
+            color: #7f8c8d;
+        }
+        
+        .locations-panel {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .location-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .location-item:last-child {
+            border-bottom: none;
+        }
+        
+        .add-location {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        input, select, button {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .marker.florida { color: #e74c3c; top: 42%; left: 25%; }
+        .marker.deutschland { color: #2ecc71; top: 33%; left: 52%; }
+        .marker.indien { color: #f39c12; top: 45%; left: 70%; }
+        .marker.niederlande { color: #9b59b6; top: 32%; left: 51%; }
+        .marker.alaska { color: #1abc9c; top: 25%; left: 15%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Meine literarische Weltkarte</h1>
+            <p>Halte den Überblick über die Zeitzonen deiner internationalen Leser und Kontakte</p>
+        </header>
+        
+        <div class="map-container">
+            <div id="world-map">
+                <img src="/api/placeholder/1200/600" alt="Weltkarte" style="width: 100%; height: 100%; object-fit: cover;">
+                
+                <!-- Deutschland -->
+                <div class="marker deutschland">
+                    <div class="marker-popup">
+                        <div class="marker-name">Deutschland (Du)</div>
+                        <div class="marker-time" id="time-deutschland"></div>
+                        <div class="marker-date" id="date-deutschland"></div>
+                    </div>
+                </div>
+                
+                <!-- Florida -->
+                <div class="marker florida">
+                    <div class="marker-popup">
+                        <div class="marker-name">Florida (Dein Flirt 😉)</div>
+                        <div class="marker-time" id="time-florida"></div>
+                        <div class="marker-date" id="date-florida"></div>
+                    </div>
+                </div>
+                
+                <!-- Indien -->
+                <div class="marker indien">
+                    <div class="marker-popup">
+                        <div class="marker-name">Indien (Leser)</div>
+                        <div class="marker-time" id="time-indien"></div>
+                        <div class="marker-date" id="date-indien"></div>
+                    </div>
+                </div>
+                
+                <!-- Niederlande -->
+                <div class="marker niederlande">
+                    <div class="marker-popup">
+                        <div class="marker-name">Niederlande (Leser)</div>
+                        <div class="marker-time" id="time-niederlande"></div>
+                        <div class="marker-date" id="date-niederlande"></div>
+                    </div>
+                </div>
+                
+                <!-- Alaska -->
+                <div class="marker alaska">
+                    <div class="marker-popup">
+                        <div class="marker-name">Alaska (Autor-Kollege)</div>
+                        <div class="marker-time" id="time-alaska"></div>
+                        <div class="marker-date" id="date-alaska"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="locations-panel">
+            <h2>Alle Zeitzonen auf einen Blick</h2>
+            <div class="location-item">
+                <div>Deutschland (Du)</div>
+                <div id="list-time-deutschland"></div>
+            </div>
+            <div class="location-item">
+                <div>Florida (Dein Flirt)</div>
+                <div id="list-time-florida"></div>
+            </div>
+            <div class="location-item">
+                <div>Indien (Leser)</div>
+                <div id="list-time-indien"></div>
+            </div>
+            <div class="location-item">
+                <div>Niederlande (Leser)</div>
+                <div id="list-time-niederlande"></div>
+            </div>
+            <div class="location-item">
+                <div>Alaska (Autor-Kollege)</div>
+                <div id="list-time-alaska"></div>
+            </div>
+        </div>
+        
+        <div class="add-location">
+            <h2>Neuen Ort hinzufügen</h2>
+            <form id="add-location-form">
+                <div class="form-group">
+                    <label for="location-name">Name des Ortes:</label>
+                    <input type="text" id="location-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="location-timezone">Zeitzone:</label>
+                    <select id="location-timezone" required>
+                        <option value="UTC-12:00">UTC-12:00</option>
+                        <option value="UTC-11:00">UTC-11:00</option>
+                        <option value="UTC-10:00">UTC-10:00</option>
+                        <option value="UTC-09:00">UTC-09:00 (Alaska)</option>
+                        <option value="UTC-08:00">UTC-08:00</option>
+                        <option value="UTC-07:00">UTC-07:00</option>
+                        <option value="UTC-06:00">UTC-06:00</option>
+                        <option value="UTC-05:00">UTC-05:00 (Florida)</option>
+                        <option value="UTC-04:00">UTC-04:00</option>
+                        <option value="UTC-03:00">UTC-03:00</option>
+                        <option value="UTC-02:00">UTC-02:00</option>
+                        <option value="UTC-01:00">UTC-01:00</option>
+                        <option value="UTC+00:00">UTC+00:00</option>
+                        <option value="UTC+01:00" selected>UTC+01:00 (Deutschland, Niederlande)</option>
+                        <option value="UTC+02:00">UTC+02:00</option>
+                        <option value="UTC+03:00">UTC+03:00</option>
+                        <option value="UTC+04:00">UTC+04:00</option>
+                        <option value="UTC+05:00">UTC+05:00</option>
+                        <option value="UTC+05:30">UTC+05:30 (Indien)</option>
+                        <option value="UTC+06:00">UTC+06:00</option>
+                        <option value="UTC+07:00">UTC+07:00</option>
+                        <option value="UTC+08:00">UTC+08:00</option>
+                        <option value="UTC+09:00">UTC+09:00</option>
+                        <option value="UTC+10:00">UTC+10:00</option>
+                        <option value="UTC+11:00">UTC+11:00</option>
+                        <option value="UTC+12:00">UTC+12:00</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="location-description">Beschreibung:</label>
+                    <input type="text" id="location-description" placeholder="z.B. Leser, Autor, etc.">
+                </div>
+                <button type="submit">Hinzufügen</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Zeitzonendefinitionen
+        const timeZones = {
+            'deutschland': { offset: 1, name: 'Europe/Berlin' },
+            'niederlande': { offset: 1, name: 'Europe/Amsterdam' },
+            'florida': { offset: -5, name: 'America/New_York' },
+            'indien': { offset: 5.5, name: 'Asia/Kolkata' },
+            'alaska': { offset: -9, name: 'America/Anchorage' }
+        };
+
+        // Funktion zum Aktualisieren aller Uhrzeiten
+        function updateAllTimes() {
+            const now = new Date();
+            
+            for (const [location, timezone] of Object.entries(timeZones)) {
+                // Zeit für diesen Ort berechnen
+                const localTime = new Date(now.getTime() + (now.getTimezoneOffset() + timezone.offset * 60) * 60000);
+                
+                // Formatieren der Zeit
+                const timeStr = localTime.toLocaleTimeString('de-DE', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false
+                });
+                
+                // Formatieren des Datums
+                const dateStr = localTime.toLocaleDateString('de-DE', { 
+                    weekday: 'long', 
+                    day: 'numeric', 
+                    month: 'long' 
+                });
+                
+                // Aktualisieren der Anzeigen auf der Karte
+                document.getElementById(`time-${location}`).textContent = timeStr;
+                document.getElementById(`date-${location}`).textContent = dateStr;
+                
+                // Aktualisieren der Anzeigen in der Liste
+                document.getElementById(`list-time-${location}`).textContent = timeStr;
+            }
+        }
+
+        // Initial alle Uhrzeiten aktualisieren
+        updateAllTimes();
+        
+        // Alle 60 Sekunden aktualisieren
+        setInterval(updateAllTimes, 60000);
+        
+        // Formular zum Hinzufügen neuer Orte
+        document.getElementById('add-location-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('Diese Funktion wäre in einer vollständigen Version implementiert. Du könntest hier neue Kontakte hinzufügen und auf der Karte platzieren.');
+        });
+    </script>
+</body>
+</html>
