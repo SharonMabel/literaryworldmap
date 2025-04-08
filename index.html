@@ -59,18 +59,13 @@
             height: 5px;
         }
         
-        .clock-card.florida:before { background-color: #e74c3c; }
-        .clock-card.deutschland:before { background-color: #2ecc71; }
-        .clock-card.indien:before { background-color: #f39c12; }
-        .clock-card.niederlande:before { background-color: #9b59b6; }
-        .clock-card.alaska:before { background-color: #1abc9c; }
-        
         .location-name {
             font-weight: bold;
             font-size: 1.3em;
             margin-bottom: 5px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
         
         .location-description {
@@ -105,6 +100,17 @@
             font-size: 1.2em;
         }
         
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0;
+            margin-left: 10px;
+            width: auto;
+        }
+        
         .add-location {
             margin-top: 20px;
             padding: 20px;
@@ -134,6 +140,24 @@
             background-color: #2980b9;
         }
         
+        .color-picker {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .color-option.selected {
+            border: 3px solid #333;
+        }
+        
         .form-group {
             margin-bottom: 15px;
         }
@@ -149,6 +173,15 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        .success-message {
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -158,18 +191,23 @@
             <p>Halte den Überblick über die Zeitzonen deiner internationalen Leser und Kontakte</p>
         </header>
         
-        <div class="clock-container">
+        <div class="clock-container" id="clock-container">
             <!-- Deutschland (Du) -->
-            <div class="clock-card deutschland">
-                <div class="location-name">Deutschland <span class="emoji">🏠</span></div>
+            <div class="clock-card deutschland" data-id="deutschland">
+                <div class="location-name">
+                    Deutschland <span class="emoji">🏠</span>
+                </div>
                 <div class="location-description">Dein Standort</div>
                 <div class="time-display" id="time-deutschland"></div>
                 <div class="date-display" id="date-deutschland"></div>
             </div>
             
             <!-- Florida (Flirt) -->
-            <div class="clock-card florida">
-                <div class="location-name">Florida <span class="emoji">😉</span></div>
+            <div class="clock-card florida" data-id="florida">
+                <div class="location-name">
+                    Florida <span class="emoji">😉</span>
+                    <button class="delete-btn" data-id="florida">✖</button>
+                </div>
                 <div class="location-description">Dein Flirt</div>
                 <div class="time-display" id="time-florida"></div>
                 <div class="date-display" id="date-florida"></div>
@@ -177,8 +215,11 @@
             </div>
             
             <!-- Indien (Leser) -->
-            <div class="clock-card indien">
-                <div class="location-name">Indien <span class="emoji">📚</span></div>
+            <div class="clock-card indien" data-id="indien">
+                <div class="location-name">
+                    Indien <span class="emoji">📚</span>
+                    <button class="delete-btn" data-id="indien">✖</button>
+                </div>
                 <div class="location-description">Deine Leser</div>
                 <div class="time-display" id="time-indien"></div>
                 <div class="date-display" id="date-indien"></div>
@@ -186,8 +227,11 @@
             </div>
             
             <!-- Niederlande (Leser) -->
-            <div class="clock-card niederlande">
-                <div class="location-name">Niederlande <span class="emoji">🌷</span></div>
+            <div class="clock-card niederlande" data-id="niederlande">
+                <div class="location-name">
+                    Niederlande <span class="emoji">🌷</span>
+                    <button class="delete-btn" data-id="niederlande">✖</button>
+                </div>
                 <div class="location-description">Deine Leser</div>
                 <div class="time-display" id="time-niederlande"></div>
                 <div class="date-display" id="date-niederlande"></div>
@@ -195,8 +239,11 @@
             </div>
             
             <!-- Alaska (Autor-Kollege) -->
-            <div class="clock-card alaska">
-                <div class="location-name">Alaska <span class="emoji">❄️</span></div>
+            <div class="clock-card alaska" data-id="alaska">
+                <div class="location-name">
+                    Alaska <span class="emoji">❄️</span>
+                    <button class="delete-btn" data-id="alaska">✖</button>
+                </div>
                 <div class="location-description">Dein Autor-Kollege</div>
                 <div class="time-display" id="time-alaska"></div>
                 <div class="date-display" id="date-alaska"></div>
@@ -206,6 +253,7 @@
         
         <div class="add-location">
             <h2>Neuen Kontakt hinzufügen</h2>
+            <div id="success-message" class="success-message">Neuer Kontakt wurde erfolgreich hinzugefügt!</div>
             <form id="add-location-form">
                 <div class="form-group">
                     <label for="location-name">Name des Ortes:</label>
@@ -250,6 +298,20 @@
                     <label for="location-emoji">Emoji:</label>
                     <input type="text" id="location-emoji" placeholder="z.B. 📱 oder 🌟">
                 </div>
+                <div class="form-group">
+                    <label for="location-color">Farbe:</label>
+                    <div class="color-picker" id="color-picker">
+                        <div class="color-option selected" style="background-color: #e74c3c;" data-color="#e74c3c"></div>
+                        <div class="color-option" style="background-color: #2ecc71;" data-color="#2ecc71"></div>
+                        <div class="color-option" style="background-color: #f39c12;" data-color="#f39c12"></div>
+                        <div class="color-option" style="background-color: #9b59b6;" data-color="#9b59b6"></div>
+                        <div class="color-option" style="background-color: #1abc9c;" data-color="#1abc9c"></div>
+                        <div class="color-option" style="background-color: #3498db;" data-color="#3498db"></div>
+                        <div class="color-option" style="background-color: #e67e22;" data-color="#e67e22"></div>
+                        <div class="color-option" style="background-color: #34495e;" data-color="#34495e"></div>
+                    </div>
+                    <input type="hidden" id="selected-color" value="#e74c3c">
+                </div>
                 <button type="submit">Hinzufügen</button>
             </form>
         </div>
@@ -265,12 +327,32 @@
             'alaska': { offset: -9, name: 'America/Anchorage' }
         };
 
+        // Funktion zum Extrahieren der UTC-Offset aus der Zeitzonenauswahl
+        function getOffsetFromSelection(selection) {
+            const match = selection.match(/UTC([+-]\d+):(\d+)/);
+            if (match) {
+                const hours = parseInt(match[1]);
+                const minutes = parseInt(match[2]) * (hours >= 0 ? 1 : -1) / 60;
+                return hours + minutes;
+            }
+            return 0;
+        }
+
+        // Funktion zur Generierung einer eindeutigen ID
+        function generateId(name) {
+            return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+        }
+
         // Funktion zum Aktualisieren aller Uhrzeiten
         function updateAllTimes() {
             const now = new Date();
             const homeOffset = timeZones['deutschland'].offset;
             
             for (const [location, timezone] of Object.entries(timeZones)) {
+                // Prüfen, ob das Element noch existiert
+                const timeElement = document.getElementById(`time-${location}`);
+                if (!timeElement) continue;
+                
                 // Zeit für diesen Ort berechnen
                 const localTime = new Date(now.getTime() + (now.getTimezoneOffset() + timezone.offset * 60) * 60000);
                 
@@ -290,22 +372,262 @@
                 });
                 
                 // Aktualisieren der Anzeigen
-                document.getElementById(`time-${location}`).textContent = timeStr;
+                timeElement.textContent = timeStr;
                 document.getElementById(`date-${location}`).textContent = dateStr;
                 
                 // Zeitdifferenz zu Deutschland berechnen (außer für Deutschland selbst)
                 if (location !== 'deutschland') {
-                    const diffInHours = timezone.offset - homeOffset;
-                    const diffStr = diffInHours > 0 
-                        ? `${Math.abs(diffInHours)} Stunden vor dir` 
-                        : diffInHours < 0 
-                            ? `${Math.abs(diffInHours)} Stunden hinter dir` 
-                            : 'Gleiche Zeitzone wie du';
-                    
-                    document.getElementById(`diff-${location}`).textContent = diffStr;
+                    const diffElement = document.getElementById(`diff-${location}`);
+                    if (diffElement) {
+                        const diffInHours = timezone.offset - homeOffset;
+                        let diffStr;
+                        
+                        if (diffInHours === 0) {
+                            diffStr = 'Gleiche Zeitzone wie du';
+                        } else {
+                            const absHours = Math.floor(Math.abs(diffInHours));
+                            const absMinutes = Math.abs(diffInHours % 1) * 60;
+                            
+                            if (absMinutes === 0) {
+                                diffStr = diffInHours > 0 
+                                    ? `${absHours} Stunden vor dir` 
+                                    : `${absHours} Stunden hinter dir`;
+                            } else {
+                                diffStr = diffInHours > 0 
+                                    ? `${absHours} Stunden und ${absMinutes} Minuten vor dir` 
+                                    : `${absHours} Stunden und ${absMinutes} Minuten hinter dir`;
+                            }
+                        }
+                        
+                        diffElement.textContent = diffStr;
+                    }
                 }
             }
         }
+
+        // Funktion zum Speichern der Orte im LocalStorage
+        function saveLocations() {
+            localStorage.setItem('timeZones', JSON.stringify(timeZones));
+        }
+
+        // Funktion zum Laden der Orte aus dem LocalStorage
+        function loadLocations() {
+            const savedLocations = localStorage.getItem('timeZones');
+            if (savedLocations) {
+                // Bestehende Zeitzonendefinitionen mit gespeicherten überschreiben
+                Object.assign(timeZones, JSON.parse(savedLocations));
+                
+                // Container leeren
+                const container = document.getElementById('clock-container');
+                container.innerHTML = '';
+                
+                // Orte neu erstellen
+                for (const [locationId, timezone] of Object.entries(timeZones)) {
+                    if (timezone.custom) {
+                        createLocationCard(
+                            locationId,
+                            timezone.displayName || locationId,
+                            timezone.description || '',
+                            timezone.emoji || '🌍',
+                            timezone.color || '#e74c3c'
+                        );
+                    } else {
+                        // Standard-Orte wiederherstellen
+                        const defaultCards = {
+                            'deutschland': {
+                                name: 'Deutschland',
+                                description: 'Dein Standort',
+                                emoji: '🏠',
+                                color: '#2ecc71'
+                            },
+                            'florida': {
+                                name: 'Florida',
+                                description: 'Dein Flirt',
+                                emoji: '😉',
+                                color: '#e74c3c'
+                            },
+                            'indien': {
+                                name: 'Indien',
+                                description: 'Deine Leser',
+                                emoji: '📚',
+                                color: '#f39c12'
+                            },
+                            'niederlande': {
+                                name: 'Niederlande',
+                                description: 'Deine Leser',
+                                emoji: '🌷',
+                                color: '#9b59b6'
+                            },
+                            'alaska': {
+                                name: 'Alaska',
+                                description: 'Dein Autor-Kollege',
+                                emoji: '❄️',
+                                color: '#1abc9c'
+                            }
+                        };
+                        
+                        if (defaultCards[locationId]) {
+                            createLocationCard(
+                                locationId,
+                                defaultCards[locationId].name,
+                                defaultCards[locationId].description,
+                                defaultCards[locationId].emoji,
+                                defaultCards[locationId].color
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // Funktion zum Erstellen einer neuen Uhrzeit-Karte
+        function createLocationCard(id, name, description, emoji, color) {
+            const container = document.getElementById('clock-container');
+            
+            // Erstellen der Karte
+            const card = document.createElement('div');
+            card.className = `clock-card`;
+            card.dataset.id = id;
+            card.style.setProperty('--card-color', color);
+            card.innerHTML = `
+                <div class="location-name">
+                    ${name} <span class="emoji">${emoji}</span>
+                    ${id !== 'deutschland' ? `<button class="delete-btn" data-id="${id}">✖</button>` : ''}
+                </div>
+                <div class="location-description">${description}</div>
+                <div class="time-display" id="time-${id}"></div>
+                <div class="date-display" id="date-${id}"></div>
+                ${id !== 'deutschland' ? `<div class="time-difference" id="diff-${id}"></div>` : ''}
+            `;
+            
+            // CSS für die Kartenfarbe
+            card.style.setProperty('--card-color', color);
+            card.style.setProperty('border-top', `5px solid ${color}`);
+            
+            // Event-Listener für den Löschen-Button
+            if (id !== 'deutschland') {
+                const deleteBtn = card.querySelector('.delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function() {
+                        deleteLocation(id);
+                    });
+                }
+            }
+            
+            // Karte zum Container hinzufügen
+            container.appendChild(card);
+            
+            // CSS-Klasse für die Kartenfarbe
+            const style = document.createElement('style');
+            style.id = `style-${id}`;
+            style.textContent = `
+                .clock-card[data-id="${id}"]:before {
+                    background-color: ${color};
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Funktion zum Löschen eines Ortes
+        function deleteLocation(id) {
+            if (confirm(`Möchtest du "${timeZones[id].displayName || id}" wirklich löschen?`)) {
+                // Element aus dem DOM entfernen
+                const card = document.querySelector(`.clock-card[data-id="${id}"]`);
+                if (card) {
+                    card.remove();
+                }
+                
+                // Style-Element entfernen
+                const style = document.getElementById(`style-${id}`);
+                if (style) {
+                    style.remove();
+                }
+                
+                // Aus der Zeitzonenliste entfernen
+                delete timeZones[id];
+                
+                // Änderungen speichern
+                saveLocations();
+            }
+        }
+
+        // Event-Listener für das Formular
+        document.getElementById('add-location-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Formulardaten abrufen
+            const locationName = document.getElementById('location-name').value.trim();
+            const locationTimezone = document.getElementById('location-timezone').value;
+            const locationDescription = document.getElementById('location-description').value.trim() || 'Dein Kontakt';
+            const locationEmoji = document.getElementById('location-emoji').value.trim() || '🌍';
+            const selectedColor = document.getElementById('selected-color').value;
+            
+            // ID generieren
+            const locationId = generateId(locationName);
+            
+            // Prüfen, ob die ID bereits existiert
+            if (timeZones[locationId]) {
+                alert(`Ein Ort mit dem Namen "${locationName}" existiert bereits. Bitte wähle einen anderen Namen.`);
+                return;
+            }
+            
+            // Zeitzonenoffset extrahieren
+            const offset = getOffsetFromSelection(locationTimezone);
+            
+            // Zur Zeitzonenliste hinzufügen
+            timeZones[locationId] = {
+                offset: offset,
+                name: locationTimezone,
+                displayName: locationName,
+                description: locationDescription,
+                emoji: locationEmoji,
+                color: selectedColor,
+                custom: true
+            };
+            
+            // Karte erstellen
+            createLocationCard(locationId, locationName, locationDescription, locationEmoji, selectedColor);
+            
+            // Änderungen speichern
+            saveLocations();
+            
+            // Formular zurücksetzen
+            this.reset();
+            document.getElementById('selected-color').value = '#e74c3c';
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            document.querySelector('.color-option[data-color="#e74c3c"]').classList.add('selected');
+            
+            // Erfolgsmeldung anzeigen
+            const successMessage = document.getElementById('success-message');
+            successMessage.textContent = `Neuer Kontakt "${locationName}" wurde erfolgreich hinzugefügt!`;
+            successMessage.style.display = 'block';
+            
+            // Erfolgsmeldung nach 3 Sekunden ausblenden
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 3000);
+        });
+        
+        // Event-Listener für die Farbauswahl
+        document.querySelectorAll('.color-option').forEach(option => {
+            option.addEventListener('click', function() {
+                document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('selected-color').value = this.dataset.color;
+            });
+        });
+        
+        // Event-Delegation für die Löschen-Buttons
+        document.getElementById('clock-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-btn')) {
+                const locationId = e.target.dataset.id;
+                if (locationId) {
+                    deleteLocation(locationId);
+                }
+            }
+        });
 
         // Initial alle Uhrzeiten aktualisieren
         updateAllTimes();
@@ -313,11 +635,8 @@
         // Alle Sekunde aktualisieren für eine laufende Uhr
         setInterval(updateAllTimes, 1000);
         
-        // Formular zum Hinzufügen neuer Orte
-        document.getElementById('add-location-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Diese Funktion wäre in einer vollständigen Version implementiert. Du könntest hier neue Kontakte hinzufügen.');
-        });
+        // Gespeicherte Orte laden
+        loadLocations();
     </script>
 </body>
 </html>
